@@ -18,43 +18,35 @@ def main():
     # insert line) when a position disappears.
     state = []
 
-    prev_listing = None
     for fp in sorted(glob.glob("data/*.html")):
         date_string = fp[len("data/"):-len(".html")]
         listing = get_listing(fp)
-        if prev_listing is None:
-            # This is the first snapshot, so add everyone
-            for name, title in listing:
-                state.append((name, title, date_string))
-        else:
-            new_state = []
-            for name, title, start_date in state:
-                if person_in_list(name, listing):
-                    if position_title_same(name, title, listing):
-                        # This person is still at the org and their position
-                        # title hasn't changed, so keep them
-                        new_state.append((name, title, start_date))
-                    else:
-                        # This person is still at the org, but their position
-                        # title has changed, so print the old position
-                        # information and add the new position to state.
-                        print_sql_line(name, title, start_date, date_string)
-                        new_state.append((name, position_title(name, listing), date_string))
+        new_state = []
+        for name, title, start_date in state:
+            if person_in_list(name, listing):
+                if position_title_same(name, title, listing):
+                    # This person is still at the org and their position
+                    # title hasn't changed, so keep them
+                    new_state.append((name, title, start_date))
                 else:
-                    # The person left the org, so print the position
-                    # information.
+                    # This person is still at the org, but their position
+                    # title has changed, so print the old position
+                    # information and add the new position to state.
                     print_sql_line(name, title, start_date, date_string)
-            state = new_state
-            for name, title in listing:
-                if not person_in_list(name, state):
-                    # This person is new to the organization, so record them in
-                    # state.
-                    state.append((name, title, date_string))
+                    new_state.append((name, position_title(name, listing), date_string))
+            else:
+                # The person left the org, so print the position
+                # information.
+                print_sql_line(name, title, start_date, date_string)
+        state = new_state
+        for name, title in listing:
+            if not person_in_list(name, state):
+                # This person is new to the organization, so record them in
+                # state.
+                state.append((name, title, date_string))
 
-                # There is no else-case because the case of a position title
-                # change is already handled in the loop over the state above.
-
-        prev_listing = listing
+            # There is no else-case because the case of a position title
+            # change is already handled in the loop over the state above.
 
     # Now we print everyone still at the org
     for name, title, start_date in state:
