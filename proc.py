@@ -60,7 +60,7 @@ def print_sql_line(name, title, start_date, end_date):
     global FIRST_PRINT
     if FIRST_PRINT:
         print("# SQL file generated using script at "
-              "# https://github.com/riceissa/gfi-positions/")
+              "https://github.com/riceissa/gfi-positions/")
         print()
         print("insert into positions(person, organization, title, start_date, "
               "start_date_precision, end_date, end_date_precision, urls, notes, "
