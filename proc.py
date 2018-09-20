@@ -121,7 +121,11 @@ def get_listing(filepath):
 
 
 def normalized_string(string):
-    return re.sub(r"\s+", " ", string)
+    string = re.sub(r"\s+", " ", string)
+    for suffix in [", Ph.D.", ", M.D.", ", Esq.", ", Ed.D.", ", MPH", ", JD"]:
+        if string.endswith(suffix):
+            string = string[:-len(suffix)]
+    return string
 
 
 def mysql_quote(x):
