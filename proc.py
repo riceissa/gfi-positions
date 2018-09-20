@@ -8,6 +8,7 @@ from bs4 import BeautifulSoup
 NAME = 0
 TITLE = 1
 START_DATE = 2
+FIRST_PRINT = True
 
 def main():
 
@@ -60,7 +61,10 @@ def main():
         print_sql_line(name, title, start_date, "NULL")
 
 def print_sql_line(name, title, start_date, end_date):
-    print("(" + f"{name}, {title}, {start_date}--{end_date}" + ")")
+    global FIRST_PRINT
+    print(("    " if FIRST_PRINT else "    ,") + "(" +
+          f"{name}, {title}, {start_date}--{end_date}" + ")")
+    FIRST_PRINT = False
 
 def position_title(name, lst):
     for item in lst:
