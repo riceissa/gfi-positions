@@ -121,6 +121,7 @@ def get_listing(filepath):
 
 
 def normalized_string(string):
+    string = string.strip()
     string = re.sub(r"\s+", " ", string)
     for suffix in [", Ph.D.", ", M.D.", ", Esq.", ", Ed.D.", ", MPH", ", JD"]:
         if string.endswith(suffix):
