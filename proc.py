@@ -21,6 +21,7 @@ def main():
     for fp in sorted(glob.glob("data/*.html")):
         date_string = fp[len("data/"):-len(".html")]
         listing = get_listing(fp)
+
         new_state = []
         for name, title, start_date in state:
             if person_in_list(name, listing):
@@ -39,6 +40,7 @@ def main():
                 # information.
                 print_sql_line(name, title, start_date, date_string)
         state = new_state
+
         for name, title in listing:
             if not person_in_list(name, state):
                 # This person is new to the organization, so record them in
