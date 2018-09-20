@@ -52,12 +52,33 @@ def main():
 
     # Now we print everyone still at the org
     for name, title, start_date in state:
-        print_sql_line(name, title, start_date, "NULL")
+        print_sql_line(name, title, start_date, "")
+    print(";")
+
 
 def print_sql_line(name, title, start_date, end_date):
     global FIRST_PRINT
-    print(("    " if FIRST_PRINT else "    ,") + "(" +
-          f"{name}, {title}, {start_date}--{end_date}" + ")")
+    if FIRST_PRINT:
+        print("insert into positions(person, organization, title, start_date, "
+              "start_date_precision, end_date, end_date_precision, urls, notes, "
+              "employment_type, cause_area) values")
+    if end_date:
+        urls = f"https://github.com/riceissa/gfi-positions/blob/master/data/{start_date}.html https://github.com/riceissa/gfi-positions/blob/master/data/{end_date}.html"
+    else:
+        urls = f"https://github.com/riceissa/gfi-positions/blob/master/data/{start_date}.html"
+    print(("    " if FIRST_PRINT else "    ,") + "(" + ",".join([
+        mysql_quote(name),  # person
+        mysql_quote("The Good Food Institute"),  # organization
+        mysql_quote(title),  # title
+        mysql_quote(start_date),  # start_date
+        mysql_quote("month"),  # start_date_precision
+        mysql_quote(end_date),  # end_date
+        mysql_quote("month" if end_date else ""),  # end_date_precision
+        mysql_quote(urls),  # urls
+        mysql_quote(""),  # notes
+        mysql_quote(""),  # employment_type
+        mysql_quote("Animal welfare"),  # cause_area
+    ]) + ")")
     FIRST_PRINT = False
 
 def position_title(name, lst):
@@ -100,6 +121,16 @@ def normalized_string(string):
     return re.sub(r"\s+", " ", string)
 
 
+def mysql_quote(x):
+    """Quote the string x using MySQL quoting rules. If x is the empty string,
+    return "NULL". Probably not safe against maliciously formed strings, but
+    our input is fixed and from a basically trustable source."""
+    if not x:
+        return "NULL"
+    x = x.replace("\\", "\\\\")
+    x = x.replace("'", "''")
+    x = x.replace("\n", "\\n")
+    return "'{}'".format(x)
 
 if __name__ == "__main__":
     main()
